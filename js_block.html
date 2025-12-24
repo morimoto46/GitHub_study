@@ -22,6 +22,37 @@
     <script>
         const canvas = document.getElementById("myCanvas");
         const ctx = canvas.getContext("2d");
+        const ballRadius = 10;
+        const paddleHeight = 10;
+        const paddleWidth = 75;
+
+        let paddleX = (canvas.width - paddleWidth) / 2;
+        let x = canvas.width / 2;
+        let y = canvas.height - 30;
+        let dx = 2;
+        let dy = -2;
+        let rightPressed = false;
+        let leftPressed = false;
+        let color="#0095DD";
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyUp", keyUpHandler, false);
+
+        function keyDownHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = true;
+            }else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = false;
+            }else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
         
         ctx.beginPath();
         ctx.rect(20, 40, 50, 50);
@@ -29,6 +60,7 @@
         ctx.fill();
         ctx.closePath();
         
+        //緑の丸を描画する処理
         ctx.beginPath();
         ctx.arc(240, 160, 20, 0, Math.PI * 2, false);
         ctx.fillStyle = "green";
@@ -41,13 +73,8 @@
         ctx.stroke()
         ctx.closePath()
 
-        const ballRadius = 10;
-        let x = canvas.width / 2;
-        let y = canvas.height - 30;
-        let dx = 2;
-        let dy = -2;
-
-        function drawBall(color="#0095DD") {
+        //ボールの色やサイズを指定する処理
+        function drawBall() {
             ctx.beginPath();
             ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
             ctx.fillStyle = color;
@@ -55,6 +82,16 @@
             ctx.closePath();
         }
 
+        //パドルの色やサイズを指定する処理
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        //ランダムカラー
         function randomColor() {
             const r = Math.floor(Math.random() * 256);
             const g = Math.floor(Math.random() * 256);
@@ -62,27 +99,40 @@
             return `rgb(${r}, ${g}, ${b})`;
         }   
 
+        //画面全体の描画をする処理
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBall();
-            x += dx;
-            y += dy;
+            drawPaddle();
 
+            //壁の衝突判定-縦
             if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
                 dx = -dx;
-                drawBall(randomColor());
+                color = randomColor();
             }
 
+            //壁の衝突判定-横
             if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
                 dy = -dy;
-                drawBall(randomColor());
+                color = randomColor();
             }
+
+            
+            if (rightPressed) {
+                paddleX += 7;
+            }else if (leftPressed) {
+                paddleX -= 7;
+                }
+            
+
+            x += dx;
+            y += dy;
 
         }
 
 
 
-        setInterval(draw, 10)
+        setInterval(draw, 10);
 
 //String(Math.random() * 100) + "95DD"
 
